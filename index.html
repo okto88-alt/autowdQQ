@@ -707,10 +707,12 @@ function switchTab(name) {
 
 // ── UI HELPERS ────────────────────────────────
 function setConnected(ok) {
-  document.getElementById('connDot').style.animation = ok ? 'pulse 2s infinite' : 'none';
-  document.getElementById('connDot').style.background = ok ? 'var(--accent)' : 'var(--danger)';
-  document.getElementById('connIndicator').classList.toggle('connected', ok);
-  document.getElementById('connLabel').textContent = ok ? 'Connected' : 'Disconnected';
+  const dot = document.getElementById('connIndicator');
+  if (dot) {
+    dot.classList.toggle('connected', ok);
+  }
+  const lbl = document.getElementById('connLabel');
+  if (lbl) lbl.textContent = ok ? 'Connected' : 'Disconnected';
 }
 
 function enableButtons(ok) {
