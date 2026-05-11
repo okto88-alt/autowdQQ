@@ -291,7 +291,7 @@ body { background:var(--bg); color:var(--text); font-family:var(--sans); min-hei
 
     <div class="sidebar-section">
       <div class="sidebar-label">Agent</div>
-      <input class="s-input" type="text" id="agentUrl" placeholder="ws://192.168.1.x:8765">
+      <input class="s-input" type="text" id="agentUrl" placeholder="wss://192.168.1.x:8765">
       <div class="s-btn-row">
         <button class="s-btn s-btn-primary" onclick="connectAgent()">Connect</button>
         <button class="s-btn s-btn-ghost" onclick="disconnectAgent()">Putus</button>
@@ -400,7 +400,7 @@ let isRunning = false;
 
 // ── WEBSOCKET ─────────────────────────────────
 function connectAgent() {
-  const url = document.getElementById('agentUrl').value.trim() || 'ws://localhost:8765';
+  const url = document.getElementById('agentUrl').value.trim() || 'wss://localhost:8765';
   if (ws) ws.close();
 
   addLog('Menghubungkan ke agent: ' + url, 'info');
