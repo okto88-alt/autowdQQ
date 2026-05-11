@@ -453,10 +453,9 @@ function handleMessage(msg) {
     case 'init':
       queue = msg.queue || [];
       renderQueue();
-      updateStats();
       if (msg.history) renderHistory(msg.history);
       send({ action: 'get_history' });
-      // Cek apakah bot masih jalan (ada item processing)
+      // Cek apakah bot masih jalan
       const hasProcessing = queue.some(i => i.status === 'processing');
       if (hasProcessing) {
         isRunning = true;
@@ -641,35 +640,18 @@ function updateItemStatus(rawKey, status, doneAt) {
   }
   const row = document.getElementById('row-' + rawKey);
   if (!row) return;
-
   // Update badge
   const badge = row.querySelector('.badge');
   if (badge) {
     badge.className = 'badge badge-' + status;
     badge.textContent = status.toUpperCase();
   }
-
   // Update kolom tanggal
   const dateCell = row.querySelector('.cell-date');
   if (dateCell && itemDoneAt) {
     const dateColor = status === 'success' ? 'var(--success)' : status === 'failed' ? 'var(--danger)' : 'var(--muted)';
     dateCell.textContent = itemDoneAt;
     dateCell.style.color = dateColor;
-  }
-
-  // Tambah Retry button kalau failed (kalau belum ada)
-  if (status === 'failed') {
-    const actCell = row.querySelector('.actions-cell');
-    if (actCell && !actCell.querySelector('.btn-xs-retry')) {
-      const btn = document.createElement('button');
-      btn.className = 'btn-xs btn-xs-retry';
-      btn.textContent = '↺ Retry';
-      btn.onclick = () => retryItem(rawKey);
-      actCell.prepend(btn);
-    }
-    // Enable delete button
-    const delBtn = actCell ? actCell.querySelector('.btn-xs-danger') : null;
-    if (delBtn) delBtn.disabled = false;
   }
 }
 
