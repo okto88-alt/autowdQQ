@@ -453,8 +453,17 @@ function handleMessage(msg) {
     case 'init':
       queue = msg.queue || [];
       renderQueue();
+      updateStats();
       if (msg.history) renderHistory(msg.history);
       send({ action: 'get_history' });
+      // Cek apakah bot masih jalan (ada item processing)
+      const hasProcessing = queue.some(i => i.status === 'processing');
+      if (hasProcessing) {
+        isRunning = true;
+        document.getElementById('btnStart').disabled = true;
+        document.getElementById('btnStop').disabled = false;
+        addLog('⚠ Bot sedang berjalan — panel reconnected', 'warn');
+      }
       addLog('Agent v' + (msg.version || '?') + ' terhubung', 'success');
       break;
 
@@ -486,7 +495,7 @@ function handleMessage(msg) {
       break;
 
     case 'status_update':
-      updateItemStatus(msg.raw_key, msg.status);
+      updateItemStatus(msg.raw_key, msg.status, msg.done_at || '');
       updateStats();
       break;
 
@@ -618,24 +627,49 @@ function renderQueue() {
   el.innerHTML = '<div class="tbl-wrap">' + header + rows + '</div>';
 }
 
-function updateItemStatus(rawKey, status) {
+function updateItemStatus(rawKey, status, doneAt) {
+  let itemDoneAt = doneAt || '';
   for (let item of queue) {
     if (item.raw_key === rawKey) {
       item.status = status;
-      if (['success','failed'].includes(status) && !item.done_at) {
-        item.done_at = new Date().toLocaleString('id-ID');
+      if (['success','failed'].includes(status)) {
+        if (!item.done_at) item.done_at = doneAt || new Date().toLocaleString('id-ID');
+        itemDoneAt = item.done_at;
       }
       break;
     }
   }
-  // Update badge saja tanpa re-render full
   const row = document.getElementById('row-' + rawKey);
-  if (row) {
-    const badge = row.querySelector('.badge');
-    if (badge) {
-      badge.className = 'badge badge-' + status;
-      badge.textContent = status.toUpperCase();
+  if (!row) return;
+
+  // Update badge
+  const badge = row.querySelector('.badge');
+  if (badge) {
+    badge.className = 'badge badge-' + status;
+    badge.textContent = status.toUpperCase();
+  }
+
+  // Update kolom tanggal
+  const dateCell = row.querySelector('.cell-date');
+  if (dateCell && itemDoneAt) {
+    const dateColor = status === 'success' ? 'var(--success)' : status === 'failed' ? 'var(--danger)' : 'var(--muted)';
+    dateCell.textContent = itemDoneAt;
+    dateCell.style.color = dateColor;
+  }
+
+  // Tambah Retry button kalau failed (kalau belum ada)
+  if (status === 'failed') {
+    const actCell = row.querySelector('.actions-cell');
+    if (actCell && !actCell.querySelector('.btn-xs-retry')) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-xs btn-xs-retry';
+      btn.textContent = '↺ Retry';
+      btn.onclick = () => retryItem(rawKey);
+      actCell.prepend(btn);
     }
+    // Enable delete button
+    const delBtn = actCell ? actCell.querySelector('.btn-xs-danger') : null;
+    if (delBtn) delBtn.disabled = false;
   }
 }
 
@@ -660,6 +694,8 @@ function startProcess() {
 
 function stopProcess() {
   send({ action: 'stop' });
+  document.getElementById('btnStop').disabled = true;
+  addLog('Mengirim perintah stop ke agent...', 'warn');
 }
 
 // ── STATS ─────────────────────────────────────
