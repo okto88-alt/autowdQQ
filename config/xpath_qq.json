@@ -1,0 +1,51 @@
+{
+  "panel": "QQ",
+  "version": "1.0",
+  "note": "Edit resource-id di sini kalau myBCA update — tidak perlu rebuild agent.exe",
+
+  "xpath": {
+    "XP_MASUK_AWAL":        "(//android.widget.TextView[@text=\"Masuk\"])[1]",
+    "XP_PASSWORD":          "//android.widget.EditText",
+    "XP_MASUK_SUBMIT":      "(//android.widget.TextView[@text=\"Masuk\"])[last()]",
+    "XP_TRANSFER_MENU":     "//android.widget.HorizontalScrollView//android.view.View[.//android.widget.TextView[@text=\"Transfer\"]]",
+    "XP_TRANSFER_MENU_ALT": "//android.view.View[.//android.widget.TextView[@text=\"Transfer\"]]",
+    "XP_REKENING_BCA":      "//android.widget.TextView[@text=\"Rekening BCA\"]",
+    "XP_TUJUAN_BARU":       "//android.widget.TextView[@text=\"Transfer ke tujuan baru\"]",
+    "XP_INPUT_REKENING":    "//android.widget.EditText",
+    "XP_LANJUT_TV":         "//android.widget.TextView[@text=\"Lanjut\"]",
+    "XP_NOMINAL_KONFIRM":   "//android.widget.TextView[contains(@text,\"IDR\")]",
+    "XP_VIRTUAL_ACCOUNT":   "//*[@clickable=\"true\" and .//android.widget.TextView[@text=\"Virtual Account\"]]",
+    "XP_VIRTUAL_ACCOUNT_2": "//android.widget.TextView[@text=\"Virtual Account\"]/ancestor::*[@clickable=\"true\"][1]",
+    "XP_VIRTUAL_ACCOUNT_3": "//*[contains(@text, \"Virtual Account\")]/ancestor::*[contains(@class, \"ViewGroup\")][1]",
+    "XP_TUJUAN_BARU_VA":    "//android.view.ViewGroup[@resource-id=\"com.bca.mybca.omni.android:id/2131363033\"]",
+    "XP_INPUT_VA":          "//android.widget.EditText[@resource-id=\"com.bca.mybca.omni.android:id/2131366352\"]",
+    "XP_LANJUT_VA":         "//android.widget.Button[@resource-id=\"com.bca.mybca.omni.android:id/2131362811\"]",
+    "XP_NOMINAL_VA":        "//android.widget.EditText[@resource-id=\"com.bca.mybca.omni.android:id/2131366357\"]",
+    "XP_LANJUT_NOM_VA":     "//android.widget.Button[@resource-id=\"com.bca.mybca.omni.android:id/2131367552\"]",
+    "XP_LANJUT_KONFIRM_VA": "//android.widget.Button[@resource-id=\"com.bca.mybca.omni.android:id/2131362826\"]",
+    "XP_TRANSFER_BERHASIL": "//android.widget.TextView[@text=\"Transfer Berhasil\"]",
+    "XP_SELESAI":           "//android.widget.TextView[@text=\"Selesai\"]",
+    "XP_NAMA_VA":           "//android.widget.TextView[@resource-id=\"com.bca.mybca.omni.android:id/2131367238\"]",
+    "XP_VA_ERROR_TEXT":     "//android.widget.TextView[@resource-id=\"com.bca.mybca.omni.android:id/2131367424\"]",
+    "XP_VA_ERROR_OK":       "//android.widget.Button[@resource-id=\"com.bca.mybca.omni.android:id/2131362797\"]"
+  },
+
+  "va_prefix": {
+    "DANA":    "3901",
+    "GOPAY":   "70001",
+    "OVO":     "39358",
+    "LINKAJA": "09110"
+  },
+
+  "bo_columns": {
+    "LOGIN_ID":  3,
+    "MEMB_NAME": 4,
+    "TICKET":    6,
+    "AMOUNT":    12,
+    "STATUS":    15,
+    "ACCT_NAME": 18,
+    "ACCT_NUM":  19,
+    "BANK_NAME": 23,
+    "AMOUNT_MULTIPLIER": 1000
+  }
+}
