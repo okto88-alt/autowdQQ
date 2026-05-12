@@ -1,0 +1,50 @@
+{
+  "panel": "QQ",
+  "app": "M-Smile",
+  "package": "com.bankmega.msmile",
+  "version": "1.0",
+  "note": "Edit xpath di sini kalau M-Smile update — tidak perlu rebuild agent.exe. Upload ke GitHub config folder.",
+
+  "xpath": {
+    "XM_LANDING_LOGIN":    "//*[@content-desc=\"LOGIN\"]",
+    "XM_PASSWORD_FIELD":   "//android.widget.EditText[@hint=\"Password\"]",
+    "XM_LOGIN_SUBMIT":     "//*[@content-desc=\"LOGIN\"]",
+    "XM_HOME_TRANSFER":    "//*[@content-desc=\"Transfer\"]",
+    "XM_BIFAST_MENU":      "//*[.//android.widget.TextView[@text=\"Transfer ke Bank Lain - BI Fast\"] and @clickable=\"true\"]",
+    "XM_INPUT_REKENING":   "//android.widget.EditText[@text=\"Input Nomor Rekening Baru\"]",
+    "XM_INPUT_REKENING_FB":"//android.widget.EditText",
+    "XM_OK_REKENING":      "//*[@content-desc=\"OK\"]",
+    "XM_PILIH_BANK":       "//*[.//android.widget.TextView[@text=\"Pilih Bank Tujuan\"] and @clickable=\"true\"]",
+    "XM_CARI_BANK":        "//android.widget.EditText[@text=\"Cari Nama Bank\"]",
+    "XM_NOMINAL_FIELD":    "//*[@content-desc=\"Nominal\"]",
+    "XM_LANJUT":           "//*[@content-desc=\"Lanjut\"]",
+    "XM_KONFIRM_NOMINAL":  "//*[contains(@content-desc,\"Rp \")]",
+    "XM_PIN_NUMPAD_1":     "//*[@content-desc=\"1\"]",
+    "XM_PIN_EDITTEXT":     "//android.widget.EditText",
+    "XM_PIN_SUBMIT":       "//android.widget.Button[@text=\"LANJUT\"]",
+    "XM_SUKSES":           "//android.widget.TextView[@text=\"Transaksi Berhasil\"]",
+    "XM_CLOSE_SUKSES":     "//android.widget.Image[@text=\"closeBtn\"]",
+    "XM_BATAL":            "//*[@content-desc=\"Batal\"]"
+  },
+
+  "bank_mapping": {
+    "BANK SYARIAH INDONESIA": "BANK SYARIAH INDONESIA",
+    "SEABANK":                "SEABANK"
+  },
+
+  "banks_handled": [
+    "BANK SYARIAH INDONESIA",
+    "SEABANK"
+  ],
+
+  "timing": {
+    "wait_app_launch":    3.0,
+    "wait_pin_digit":     0.15,
+    "wait_between_wd":    2.0,
+    "wait_after_type":    0.2,
+    "timeout_short":      2,
+    "timeout_medium":     4,
+    "timeout_long":       6,
+    "timeout_transfer":   20
+  }
+}
