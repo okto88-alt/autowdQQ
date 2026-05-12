@@ -253,6 +253,27 @@ body { background:var(--bg); color:var(--text); font-family:var(--sans); min-hei
 .btn-modal-primary { background:var(--accent); color:#fff; }
 .btn-modal-primary:hover { background:#1D4ED8; }
 
+/* ── SCREENSHOT MODAL ── */
+#screenshotModal .modal {
+  width: 90vw; max-width: 780px; padding: 20px;
+}
+#screenshotImg {
+  width: 100%; max-height: 70vh; object-fit: contain;
+  border-radius: 8px; border: 1px solid var(--border);
+  display: block; margin: 12px 0 0;
+  background: #0F172A;
+}
+#screenshotLoading {
+  text-align: center; padding: 40px 0;
+  color: var(--muted); font-size: 13px;
+}
+.btn-xs-screenshot {
+  background: #0EA5E9; color: #fff; border: none;
+  border-radius: 4px; padding: 3px 7px; font-size: 11px;
+  cursor: pointer; font-weight: 600; transition: background 0.15s;
+}
+.btn-xs-screenshot:hover { background: #0284C7; }
+
 /* ── DIVIDER ── */
 .s-divider { height:1px; background:#2D4A6B; margin:4px 0 16px; }
 
@@ -399,6 +420,21 @@ body { background:var(--bg); color:var(--text); font-family:var(--sans); min-hei
   </div>
 </div>
 
+<!-- SCREENSHOT MODAL -->
+<div class="modal-overlay" id="screenshotModal" onclick="closeScreenshot(event)">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2 style="margin:0;font-size:15px" id="screenshotTitle">Bukti Transfer</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn-modal btn-modal-primary" id="screenshotDownloadBtn" style="padding:6px 14px;font-size:12px" onclick="downloadScreenshot()">⬇ Download</button>
+        <button class="btn-modal btn-modal-ghost" style="padding:6px 14px;font-size:12px" onclick="closeScreenshot()">✕ Tutup</button>
+      </div>
+    </div>
+    <div id="screenshotLoading">Memuat bukti transfer...</div>
+    <img id="screenshotImg" src="" alt="Bukti Transfer" style="display:none">
+  </div>
+</div>
+
 <script>
 
 // ── STATE ─────────────────────────────────────
@@ -531,6 +567,10 @@ function handleMessage(msg) {
       renderHistory(msg.history || []);
       break;
 
+    case 'screenshot_result':
+      handleScreenshotResult(msg);
+      break;
+
     case 'error':
       addLog('ERROR: ' + msg.msg, 'error');
       break;
@@ -608,6 +648,8 @@ function renderQueue() {
     const canDel = ['pending','failed','skipped'].includes(status);
     const delBtn = canDel
       ? `<button class="btn-xs btn-xs-danger" onclick="deleteItem('${item.raw_key}')">✕</button>` : '';
+    const ssBtn = (status === 'success' && item.screenshot_path)
+      ? `<button class="btn-xs btn-xs-screenshot" onclick="viewScreenshot('${item.raw_key}', '${item.tiket||''}')">📷</button>` : '';
     return `
       <div class="tbl-row" id="row-${item.raw_key}">
         <div><span class="badge badge-${status}">${status.toUpperCase()}</span></div>
@@ -618,7 +660,7 @@ function renderQueue() {
         <div><span class="bank-tag bank-${item.bank||'BCA'}">${item.bank||'BCA'}</span></div>
         <div class="cell cell-amount">IDR ${nominal}</div>
         <div class="cell cell-date" style="color:${dateColor}">${doneAt}</div>
-        <div class="actions-cell">${retryBtn}${delBtn}</div>
+        <div class="actions-cell">${ssBtn}${retryBtn}${delBtn}</div>
       </div>`;
   }).join('');
 
@@ -664,6 +706,65 @@ function retryItem(rawKey) {
 
 function clearDone() {
   send({ action: 'clear_done' });
+}
+
+// ── SCREENSHOT ────────────────────────────────
+let _ssCurrentB64  = null;
+let _ssCurrentFname = null;
+
+function viewScreenshot(rawKey, tiket) {
+  const modal   = document.getElementById('screenshotModal');
+  const img     = document.getElementById('screenshotImg');
+  const loading = document.getElementById('screenshotLoading');
+  const title   = document.getElementById('screenshotTitle');
+  const dlBtn   = document.getElementById('screenshotDownloadBtn');
+
+  // Reset state
+  _ssCurrentB64   = null;
+  _ssCurrentFname = null;
+  img.style.display    = 'none';
+  img.src              = '';
+  loading.style.display = 'block';
+  loading.textContent  = 'Memuat bukti transfer...';
+  title.textContent    = `Bukti Transfer — Tiket ${tiket || rawKey}`;
+  dlBtn.disabled       = true;
+
+  modal.classList.add('open');
+  send({ action: 'get_screenshot', raw_key: rawKey });
+}
+
+function handleScreenshotResult(msg) {
+  const img     = document.getElementById('screenshotImg');
+  const loading = document.getElementById('screenshotLoading');
+  const dlBtn   = document.getElementById('screenshotDownloadBtn');
+
+  if (!msg.ok) {
+    loading.textContent = '⚠ ' + (msg.msg || 'Screenshot tidak tersedia');
+    return;
+  }
+  _ssCurrentB64   = msg.data;
+  _ssCurrentFname = msg.fname || 'bukti_transfer.png';
+  img.src              = 'data:image/png;base64,' + msg.data;
+  img.style.display    = 'block';
+  loading.style.display = 'none';
+  dlBtn.disabled       = false;
+}
+
+function downloadScreenshot() {
+  if (!_ssCurrentB64) return;
+  const a    = document.createElement('a');
+  a.href     = 'data:image/png;base64,' + _ssCurrentB64;
+  a.download = _ssCurrentFname || 'bukti_transfer.png';
+  a.click();
+}
+
+function closeScreenshot(e) {
+  // Tutup kalau klik overlay (bukan konten modal) atau tombol tutup
+  if (e && e.target !== document.getElementById('screenshotModal')) return;
+  document.getElementById('screenshotModal').classList.remove('open');
+  const img = document.getElementById('screenshotImg');
+  img.src = '';  // bebaskan memory
+  _ssCurrentB64 = null;
 }
 
 // ── PROCESS ───────────────────────────────────
