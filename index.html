@@ -119,8 +119,13 @@ body { background:var(--bg); color:var(--text); font-family:var(--sans); min-hei
 .dev-profile {
   background:#162B45; border:1px solid #2D4A6B; border-radius:8px;
   padding:10px 12px; margin-top:6px; display:none;
+  animation: slideDown 0.18s ease;
 }
 .dev-profile.open { display:block; }
+@keyframes slideDown {
+  from { opacity:0; transform:translateY(-4px); }
+  to   { opacity:1; transform:translateY(0); }
+}
 .dev-profile-label {
   font-size:10px; font-weight:600; letter-spacing:0.8px; text-transform:uppercase;
   color:#7B93B3; margin-bottom:8px;
@@ -558,7 +563,9 @@ function handleMessage(msg) {
 
     case 'profile_saved':
       deviceProfiles[msg.serial] = msg.profile;
-      showProfileStatus(msg.serial, '✓ Profile tersimpan');
+      showProfileStatus(msg.serial, '✓ Tersimpan');
+      // Auto-collapse panel setelah 800ms (kasih waktu user baca konfirmasi)
+      setTimeout(() => collapseDeviceProfile(msg.serial), 800);
       addLog(`Profile ${msg.profile.label || msg.serial} tersimpan — banks: ${(msg.profile.banks||[]).join(', ')}`, 'success');
       break;
 
@@ -709,6 +716,33 @@ function openDeviceProfile(serial, profile) {
   }
 }
 
+function collapseDeviceProfile(serial) {
+  const panel = document.getElementById('dp-' + serial);
+  if (panel) panel.classList.remove('open');
+  // Update label & bank info di device-item tanpa re-render semua
+  const prof  = deviceProfiles[serial] || {};
+  const label = prof.label ? ` — ${prof.label}` : '';
+  const banks = (prof.banks || []).join(', ');
+  const nameEl = document.querySelector(`#di-${serial} .device-name`);
+  if (nameEl) {
+    // Ambil nama model HP (bagian sebelum label lama)
+    const baseName = nameEl.textContent.split(' — ')[0];
+    nameEl.textContent = baseName + label;
+  }
+  // Update / tambah bank info line
+  const serialEl = document.querySelector(`#di-${serial} .device-serial`);
+  if (serialEl) {
+    let bankEl = serialEl.nextElementSibling;
+    if (!bankEl || !bankEl.dataset.bankInfo) {
+      bankEl = document.createElement('div');
+      bankEl.dataset.bankInfo = '1';
+      bankEl.style.cssText = 'font-size:9px;color:#3B82F6;margin-top:2px';
+      serialEl.after(bankEl);
+    }
+    bankEl.textContent = banks;
+  }
+}
+
 function saveDeviceProfile(serial) {
   const label = (document.getElementById('dlabel-' + serial)?.value || '').trim();
   const app   = document.getElementById('dapp-'   + serial)?.value || 'mybca';
@@ -727,6 +761,19 @@ function showProfileStatus(serial, msg) {
 }
 
 function connectDevice(serial, el) {
+  // Jika device ini sudah selected → toggle profile panel
+  if (selectedDevice === serial) {
+    const panel = document.getElementById('dp-' + serial);
+    if (panel) {
+      if (panel.classList.contains('open')) {
+        collapseDeviceProfile(serial);
+      } else {
+        panel.classList.add('open');
+        renderBankChips(serial);
+      }
+    }
+    return;
+  }
   document.querySelectorAll('.device-item').forEach(d => d.classList.remove('selected'));
   el.classList.add('selected');
   selectedDevice = serial;
