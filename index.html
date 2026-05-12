@@ -329,7 +329,6 @@ body { background:var(--bg); color:var(--text); font-family:var(--sans); min-hei
       <div class="sidebar-label">Proses</div>
       <button class="s-btn s-btn-primary" onclick="startProcess()" id="btnStart" disabled>▶ Start</button>
       <button class="s-btn s-btn-danger" onclick="stopProcess()" id="btnStop" disabled>■ Stop</button>
-      <button class="s-btn s-btn-ghost" onclick="clearDone()">🗑 Hapus Selesai</button>
     </div>
 
     <div class="s-divider"></div>
@@ -793,7 +792,6 @@ function renderHistory(history) {
 
   const header = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
     <span style="font-size:13px;font-weight:600;color:var(--text2)">${historyData.length} transaksi</span>
-    <button onclick="clearHistory()" style="padding:5px 12px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--danger);font-family:var(--sans)">🗑 Clear History</button>
   </div>
   <div class="tbl-wrap">
     <div style="display:grid;grid-template-columns:90px 40px 100px 1fr 120px 76px 110px 110px 90px;gap:0;padding:10px 14px;background:#F1F5F9;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted)">
