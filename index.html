@@ -867,7 +867,7 @@ function applyQueueFilter() {
     if (fNama     && !(item.nama     ||'').toLowerCase().includes(fNama))     return false;
     if (fRekening && !(item.rekening ||'').toLowerCase().includes(fRekening)) return false;
     return true;
-  });
+  }).slice().reverse();  // terbaru (index tertinggi) tampil di halaman 1
 
   // Reset ke halaman 1 kalau filter berubah
   const totalPages = Math.max(1, Math.ceil(queueFiltered.length / PAGE_SIZE));
